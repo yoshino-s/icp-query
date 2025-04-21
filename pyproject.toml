@@ -1,37 +1,30 @@
 [project]
-name = "icpapi-20240225-yolo8"
+name = "icp-query"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11.3"
 dependencies = [
-    "aiohttp>=3.11.16",
-    "cryptography>=44.0.2",
     "ddddocr>=1.5.6",
-    "fastapi[uvicorn]>=0.115.12",
+    "fastapi[standard]>=0.115.12",
     "gunicorn>=23.0.0",
     "httpx>=0.28.1",
-    "imagehash>=4.3.2",
-    "ipykernel>=6.29.5",
-    "ipywidgets>=8.1.6",
-    "matplotlib>=3.10.1",
     "numpy>=2.2.4",
-    "onnx>=1.17.0",
     "onnxruntime>=1.21.0",
-    "pandas>=2.2.3",
-    "pillow>=11.2.1",
     "pycryptodome>=3.22.0",
     "pydantic>=2.11.3",
-    "scikit-image>=0.25.2",
-    "scikit-learn>=1.6.1",
-    "tqdm>=4.67.1",
     "ultralytics>=8.3.23",
     "uvicorn>=0.34.2",
 ]
 
 [dependency-groups]
 dev = [
+    "ipykernel>=6.29.5",
+    "ipywidgets>=8.1.6",
     "isort>=6.0.1",
+    "matplotlib>=3.10.1",
     "pre-commit>=4.2.0",
     "ruff>=0.11.6",
+    "scikit-learn>=1.6.1",
+    "tqdm>=4.67.1",
 ]

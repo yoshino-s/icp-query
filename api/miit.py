@@ -48,7 +48,6 @@ class MiitApi(httpx.AsyncClient):
             },
         )
 
-
     async def setup_cookie(self):
         await self.get("https://beian.miit.gov.cn/")
         assert self.cookies.get("__jsluid_s", None) is not None
