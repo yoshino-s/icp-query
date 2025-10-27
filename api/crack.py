@@ -6,24 +6,32 @@ import ddddocr
 import numpy as np
 import onnxruntime
 
-bg_files = [cv2.imread(str(bg_file)) for bg_file in Path("base").glob("*.jpg")]
+SIZE = (500, 190)
+
+
+medium_imgs = Path(__file__).parent.parent / "data" / "medium"
+
+bg_files = [cv2.imread(str(bg_file)) for bg_file in medium_imgs.glob("*.png")]
 
 
 def extract_features(image):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    hist = cv2.calcHist([gray], [0], None, [256], [0, 256])
-    normalized_hist = cv2.normalize(hist, hist).flatten()
-    mean_color = cv2.mean(image)[:3]  # 获取 BGR 三个通道的均值
-    return np.concatenate((normalized_hist, mean_color))
+    # assert size is SIZE
+    assert image.shape[1] == SIZE[0] and image.shape[0] == SIZE[1]
+
+    blurred = cv2.GaussianBlur(image, (5, 5), 0)
+    # gray = cv2.cvtColor(blurred, cv2.COLOR_BGR2GRAY)
+    thumbnail = cv2.resize(blurred, (50, 20), interpolation=cv2.INTER_AREA)
+    # hist = cv2.calcHist([gray], [0], None, [256], [0, 256])
+    # normalized_hist = cv2.normalize(hist, hist).flatten()
+    # mean_color = cv2.mean(blurred)[:3]  # 获取 BGR 三个通道的均值
+    return thumbnail.flatten()
 
 
 bg_features = [extract_features(bg) for bg in bg_files]
 
 
-def find_background(img: np.ndarray, thresh=12):
+def find_background(img: np.ndarray):
     global bg_files
-    prev_size = img.shape[:2][::-1]
-    img = cv2.resize(img, (500, 200))
 
     features = extract_features(img)
     distances = []
@@ -40,7 +48,7 @@ def find_background(img: np.ndarray, thresh=12):
     # _, diff = cv2.threshold(diff, thresh, 255, cv2.THRESH_BINARY)
     diff = cv2.bitwise_not(diff)
 
-    return bg, cv2.resize(diff, prev_size)
+    return bg, diff
 
 
 class Crack:
@@ -91,12 +99,12 @@ class Crack:
         result_list = []
 
         big_img_copy = self.big_img.copy()
+        small_imgs = self.read_base64_image(small_img)
 
         for idx, x in enumerate(positions):
             if len(result_list) == 4:
                 break
-            raw_image2 = self.read_base64_image(small_img)
-            raw_image2 = raw_image2[11 : 11 + 28, x : x + 26]
+            raw_image2 = small_imgs[11 : 11 + 28, x : x + 26]
             img2 = cv2.cvtColor(raw_image2, cv2.COLOR_BGR2RGB)
             img2 = cv2.resize(img2, (105, 105))
             image_data_2 = np.array(img2) / 255.0
@@ -117,11 +125,7 @@ class Crack:
                 output = session.run(None, inputs)
                 output_sigmoid = 1 / (1 + np.exp(-output[0]))
                 res = output_sigmoid[0][0]
-                # print(res)
                 if res >= 0.7:
-                    # print("\n")
-                    # print(res)
-                    # print(box)
                     result_list.append([box[0], box[1]])
                     cv2.rectangle(
                         big_img_copy,
@@ -142,7 +146,8 @@ class Crack:
                     break
 
         if show:
-            cv2.imshow("img", big_img_copy)
+            concatenated = np.vstack((big_img_copy, small_imgs))
+            cv2.imshow("img", concatenated)
             cv2.waitKey(0)
             cv2.destroyAllWindows()
 

@@ -86,7 +86,7 @@ class MiitApi(httpx.AsyncClient):
 
         return point_id
 
-    async def solve_captcha(self) -> str:
+    async def solve_captcha(self) -> tuple[str, str]:
         client_uid = await self.get_client_uid()
         res = await self.post(
             "https://hlwicpfwc.miit.gov.cn/icpproject_query/api/image/getCheckImagePoint",
@@ -121,7 +121,7 @@ class MiitApi(httpx.AsyncClient):
         if not res.json()["success"]:
             raise ValueError("captcha failed")
 
-        return res.json()["params"]["sign"]
+        return (captcha.uuid, res.json()["params"]["sign"])
 
     def generate_pointjson(self, big_img, small_img, secret_key: str):
         boxes = self.crack.detect(big_img)
@@ -134,13 +134,14 @@ class MiitApi(httpx.AsyncClient):
         )
         return base64.b64encode(ciphertext).decode()
 
-    async def query(self, sign: str, domain: str):
+    async def query(self, uuid: str, sign: str, domain: str, page=1):
         headers = {
             "Token": self.token,
             "Sign": sign,
+            "Uuid": uuid,
         }
 
-        data = {"pageNum": "", "pageSize": "", "unitName": domain, "serviceType": 1}
+        data = {"pageNum": page, "pageSize": 40, "unitName": domain, "serviceType": 1}
         resp = await self.post(
             "https://hlwicpfwc.miit.gov.cn/icpproject_query/api/icpAbbreviateInfo/queryByCondition/",
             headers=headers,
@@ -151,20 +152,29 @@ class MiitApi(httpx.AsyncClient):
         d = resp.json()
 
         if not d["success"]:
+            print(d)
             raise ValueError(f"query failed: {d['msg']}")
         if d["params"]["total"] == 0:
-            return None
-        return QueryResult.model_validate(d["params"]["list"][0])
+            return []
+        return [QueryResult.model_validate(i) for i in d["params"]["list"]]
 
 
 if __name__ == "__main__":
 
     async def main():
         async with MiitApi() as client:
-            # auth = await client.solve_captcha()
-            auth = "eyJ0eXBlIjozLCJleHREYXRhIjp7InZhZnljb2RlX2ltYWdlX2tleSI6IjZiZGNjY2U2NDI4MjRjYzA5ZjQ5OWY1Y2RkYmJiNWM4In0sImUiOjE3NDUyMDM1NzQ4MDV9.GKmKKgseF6zT0k_hrMtdcIBokZYSk3O5-LOgtTiPYjA"
-            print(auth)
-            print(await client.query(auth, "baidu.com"))
+            uuid, auth = await client.solve_captcha()
+            # print(uuid, auth)
+            # uuid, auth = "442bf42a08f14e9b81aeb46efb5e698b", "eyJ0eXBlIjozLCJleHREYXRhIjp7InZhZnljb2RlX2ltYWdlX2tleSI6IjQ0MmJmNDJhMDhmMTRlOWI4MWFlYjQ2ZWZiNWU2OThiIn0sImUiOjE3NjExMjI4OTA5MjJ9._ZlIe5SmHdFV6OvwHk-c2LJ4uKZ9Myktbt7eg6eSK3M"
+            page = 1
+            while True:
+                print(f"--- Page {page} ---")
+                res = await client.query(uuid, auth, "北京百度网讯科技有限公司", page=1)
+                print(len(res))
+                if len(res) < 40:
+                    break
+                await asyncio.sleep(1)
+                page += 1
 
     import asyncio
 
