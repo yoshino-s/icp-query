@@ -1,18 +1,41 @@
+<div align="center">
+
 # ICP 备案查询服务
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688.svg)](https://fastapi.tiangolo.com)
+[![Code style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+
+**中文** | [English](README_EN.md)
 
 一个基于 FastAPI 的 ICP 备案信息查询服务，通过自动化验证码识别技术，实现对工信部备案查询系统的自动化查询。
 
+[功能特性](#-功能特性) • [快速开始](#-快速开始) • [API 文档](#-api-文档) • [许可证](#-许可证)
+
+</div>
+
+---
+
 ## 📋 目录
 
-- [功能特性](#功能特性)
-- [技术栈](#技术栈)
-- [工作原理](#工作原理)
-- [快速开始](#快速开始)
-- [配置说明](#配置说明)
-- [API 文档](#api-文档)
-- [Docker 部署](#docker-部署)
-- [开发说明](#开发说明)
-- [常见问题](#常见问题)
+<details>
+<summary>点击展开</summary>
+
+- [功能特性](#-功能特性)
+- [技术栈](#-技术栈)
+- [工作原理](#-工作原理)
+- [快速开始](#-快速开始)
+- [配置说明](#-配置说明)
+- [API 文档](#-api-文档)
+- [Docker 部署](#-docker-部署)
+- [开发说明](#-开发说明)
+- [常见问题](#-常见问题)
+- [许可证](#-许可证)
+
+</details>
+
+---
 
 ## ✨ 功能特性
 
@@ -22,6 +45,8 @@
 - 🚀 **高性能**：基于 FastAPI 异步框架，支持高并发查询
 - 🐳 **容器化部署**：提供 Docker 镜像，一键部署
 - 🔧 **GPU 加速**：支持 ONNX Runtime GPU 加速，提升验证码识别速度
+
+---
 
 ## 🛠 技术栈
 
@@ -39,6 +64,8 @@
 - **httpx**: 异步 HTTP 客户端
 - **Pydantic**: 数据验证和序列化
 - **FastAPI CLI**: 内置的服务器启动工具
+
+---
 
 ## 🔬 工作原理
 
@@ -119,6 +146,8 @@
 - **自动补充**：当池为空时，自动生成新的认证信息
 - **线程安全**：使用异步锁保证并发安全
 
+---
+
 ## 🚀 快速开始
 
 ### 环境要求
@@ -128,32 +157,32 @@
 
 ### 安装步骤
 
-1. **克隆项目**
+#### 1. 克隆项目
 
 ```bash
 git clone <repository-url>
 cd icp-query
 ```
 
-2. **安装依赖**
+#### 2. 安装依赖
 
-使用 `uv`（推荐）：
+**使用 `uv`（推荐）：**
 
 ```bash
 uv sync
 ```
 
-或使用 `pip`：
+**或使用 `pip`：**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. **准备模型文件**
+#### 3. 准备模型文件
 
 确保项目根目录存在 `siamese.onnx` 模型文件。
 
-4. **配置数据库**
+#### 4. 配置数据库
 
 编辑 `config.yaml`：
 
@@ -164,19 +193,15 @@ database:
   dsn: "sqlite+aiosqlite:///./icp_records.db"
 ```
 
-5. **启动服务**
+#### 5. 启动服务
 
-**开发环境**：
-
-使用 `fastapi dev`（推荐，支持自动重载）：
+**开发环境：**
 
 ```bash
 fastapi dev icp_query.app:app
 ```
 
-**生产环境**：
-
-使用 `fastapi run`：
+**生产环境：**
 
 ```bash
 fastapi run icp_query.app:app --host 0.0.0.0 --port 8000
@@ -189,6 +214,8 @@ fastapi run icp_query.app:app --host 0.0.0.0 --port 8000
 ```bash
 curl "http://localhost:8000/query?name=北京百度网讯科技有限公司"
 ```
+
+---
 
 ## ⚙️ 配置说明
 
@@ -211,6 +238,8 @@ database:
 - `USE_ONNX_CUDA`: 控制是否使用 GPU 加速
   - 设置为 `0`、`false` 或 `no` 时禁用 GPU（即使可用）
   - 默认：自动检测并使用可用的 GPU
+
+---
 
 ## 📚 API 文档
 
@@ -275,6 +304,8 @@ curl "http://localhost:8000/solve_captcha"
 
 **500 Internal Server Error**: 服务器内部错误（如验证码识别失败）
 
+---
+
 ## 🐳 Docker 部署
 
 ### 构建镜像
@@ -319,6 +350,8 @@ services:
 docker-compose up -d
 ```
 
+---
+
 ## 💻 开发说明
 
 ### 项目结构
@@ -340,7 +373,7 @@ icp-query/
 │   └── logging.py         # 日志配置
 ├── scripts/               # 工具脚本
 │   ├── fetch.py           # 验证码数据采集脚本
-│   └── process_images.py # 图像处理脚本
+│   └── process_images.py  # 图像处理脚本
 ├── data/                  # 数据目录
 │   ├── big/               # 大图样本
 │   ├── small/             # 小图样本
@@ -354,20 +387,20 @@ icp-query/
 
 ### 开发环境设置
 
-1. **安装开发依赖**
+#### 1. 安装开发依赖
 
 ```bash
 uv sync --group dev
 ```
 
-2. **代码格式化**
+#### 2. 代码格式化
 
 ```bash
 ruff format .
 ruff check .
 ```
 
-3. **运行应用**
+#### 3. 运行应用
 
 ```bash
 # 开发模式（支持自动重载）
@@ -410,11 +443,13 @@ export USE_ONNX_CUDA=1
 export USE_ONNX_CUDA=0
 ```
 
+---
+
 ## ❓ 常见问题
 
 ### Q: 验证码识别失败怎么办？
 
-A: 
+**A:**
 1. 检查 `siamese.onnx` 模型文件是否存在
 2. 检查背景模板图片是否完整（`data/medium/` 目录）
 3. 查看日志了解具体错误信息
@@ -422,7 +457,7 @@ A:
 
 ### Q: 查询速度慢？
 
-A:
+**A:**
 1. 启用 GPU 加速（如果可用）
 2. 增加验证码池大小
 3. 使用缓存避免重复查询
@@ -430,24 +465,26 @@ A:
 
 ### Q: 如何更新模型？
 
-A:
+**A:**
 1. 将新的 `siamese.onnx` 文件替换旧文件
 2. 确保模型输入输出格式匹配
 3. 重启服务
 
 ### Q: 数据库文件位置？
 
-A: 默认位置为项目根目录下的 `icp_records.db`。可以通过 `config.yaml` 中的 `database.dsn` 配置修改。
+**A:** 默认位置为项目根目录下的 `icp_records.db`。可以通过 `config.yaml` 中的 `database.dsn` 配置修改。
 
 ### Q: 支持哪些数据库？
 
-A: 当前版本使用 SQLite，但可以通过修改 `database.dsn` 配置使用其他 SQLAlchemy 支持的数据库（如 PostgreSQL、MySQL）。
+**A:** 当前版本使用 SQLite，但可以通过修改 `database.dsn` 配置使用其他 SQLAlchemy 支持的数据库（如 PostgreSQL、MySQL）。
+
+---
 
 ## 📝 许可证
 
 本项目采用 [MIT License](LICENSE) 许可证。
 
-**重要免责声明**：
+### 重要免责声明
 
 本项目仅供学习和研究使用。使用本软件时，您需要：
 
@@ -464,9 +501,13 @@ A: 当前版本使用 SQLite，但可以通过修改 `database.dsn` 配置使用
 
 使用本软件即表示您已阅读、理解并同意遵守上述条款，并承担使用本软件的全部责任。
 
+---
+
 ## 🤝 贡献
 
 欢迎提交 Issue 和 Pull Request！
+
+---
 
 ## 📧 联系方式
 
@@ -474,4 +515,12 @@ A: 当前版本使用 SQLite，但可以通过修改 `database.dsn` 配置使用
 
 ---
 
+<div align="center">
+
 **⚠️ 法律声明**: 本项目仅供学习和研究使用。使用本软件前，请仔细阅读 [LICENSE](LICENSE) 文件中的完整免责声明。使用本软件即表示您同意承担所有相关法律责任。
+
+Made with ❤️ by the ICP Query Project Contributors
+
+[中文](#icp-备案查询服务) | [English](README_EN.md)
+
+</div>

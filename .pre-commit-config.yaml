@@ -13,6 +13,6 @@ repos:
     hooks:
       - id: uv-lock
       - id: uv-export
-        args: ["--no-dev", "--frozen", "--output-file=requirements.txt"]
+        args: ["--no-dev", "--no-hashes", "--frozen", "--output-file=requirements.txt"]
       - id: uv-export
-        args: ["--only-dev", "--frozen", "--output-file=requirements-dev.txt"]
+        args: ["--only-dev", "--no-hashes", "--frozen", "--output-file=requirements-dev.txt"]
