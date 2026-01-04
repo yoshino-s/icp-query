@@ -1,10 +1,63 @@
 import base64
+import logging
+import os
 from pathlib import Path
 
 import cv2
 import ddddocr
 import numpy as np
 import onnxruntime
+
+logging.basicConfig(level=logging.INFO)
+
+
+def create_onnx_session(model_path: str):
+    """Create an ONNX Runtime session using GPU if available.
+
+    Detection logic:
+    - If the system has CUDAExecutionProvider available and the env var
+      USE_ONNX_CUDA is not explicitly set to 0/false, we enable CUDA.
+    - Fallback to CPUExecutionProvider otherwise.
+    """
+    available_providers = onnxruntime.get_available_providers()
+    use_cuda_env = os.getenv("USE_ONNX_CUDA")
+    # Consider a set of accelerated providers (CUDA, TensorRT, CoreML, DML, ROCm, etc.)
+    accelerated_candidates = [
+        "CUDAExecutionProvider",
+        "TensorrtExecutionProvider",
+        "DmlExecutionProvider",
+        "ROCMExecutionProvider",
+        "CoreMLExecutionProvider",
+        "OpenVINOExecutionProvider",
+        "MIGraphXExecutionProvider",
+    ]
+
+    # Find the first available accelerated provider from the list
+    active_accel = None
+    for p in accelerated_candidates:
+        if p in available_providers:
+            active_accel = p
+            break
+
+    # Environment variable to control CUDA/acceleration usage. If USE_ONNX_CUDA is set to
+    # 0/false/no the acceleration is disabled even when available.
+    disabled = use_cuda_env is not None and use_cuda_env.lower() in ("0", "false", "no")
+
+    if active_accel and not disabled:
+        providers = [active_accel, "CPUExecutionProvider"]
+    else:
+        providers = ["CPUExecutionProvider"]
+
+    logging.info(
+        "ONNX available providers: %s, active providers: %s",
+        available_providers,
+        providers,
+    )
+
+    return onnxruntime.InferenceSession(model_path, providers=providers)
+
+
+session = create_onnx_session("siamese.onnx")
 
 SIZE = (500, 190)
 
@@ -94,7 +147,6 @@ class Crack:
         return r
 
     def siamese(self, small_img, boxes, show=False):
-        session = onnxruntime.InferenceSession("siamese.onnx")
         positions = [165, 200, 231, 265]
         result_list = []
 

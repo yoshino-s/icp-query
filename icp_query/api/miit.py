@@ -8,8 +8,9 @@ import httpx
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
 from pydantic import BaseModel
+from verboselogs import VerboseLogger
 
-from api.crack import Crack
+from .crack import Crack
 
 
 class Captcha(BaseModel):
@@ -36,6 +37,7 @@ class QueryResult(BaseModel):
 
 
 class MiitApi(httpx.AsyncClient):
+    looger = VerboseLogger("MiitApi")
     token: str
 
     def __init__(self):
@@ -142,11 +144,13 @@ class MiitApi(httpx.AsyncClient):
         }
 
         data = {"pageNum": page, "pageSize": 40, "unitName": domain, "serviceType": 1}
+        print(time.time(), "querying page", page)
         resp = await self.post(
             "https://hlwicpfwc.miit.gov.cn/icpproject_query/api/icpAbbreviateInfo/queryByCondition/",
             headers=headers,
             json=data,
         )
+        print(time.time(), "page", page, "fetched")
 
         resp.raise_for_status()
         d = resp.json()
@@ -163,18 +167,12 @@ if __name__ == "__main__":
 
     async def main():
         async with MiitApi() as client:
+            print(time.time(), "start")
             uuid, auth = await client.solve_captcha()
-            # print(uuid, auth)
-            # uuid, auth = "442bf42a08f14e9b81aeb46efb5e698b", "eyJ0eXBlIjozLCJleHREYXRhIjp7InZhZnljb2RlX2ltYWdlX2tleSI6IjQ0MmJmNDJhMDhmMTRlOWI4MWFlYjQ2ZWZiNWU2OThiIn0sImUiOjE3NjExMjI4OTA5MjJ9._ZlIe5SmHdFV6OvwHk-c2LJ4uKZ9Myktbt7eg6eSK3M"
-            page = 1
-            while True:
-                print(f"--- Page {page} ---")
-                res = await client.query(uuid, auth, "北京百度网讯科技有限公司", page=1)
-                print(len(res))
-                if len(res) < 40:
-                    break
-                await asyncio.sleep(1)
-                page += 1
+            print(time.time(), "captcha solved")
+            res = await client.query(uuid, auth, "北京百度网讯科技有限公司")
+            print(time.time(), "query finished")
+            print(len(res))
 
     import asyncio
 

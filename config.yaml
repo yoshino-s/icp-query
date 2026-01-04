@@ -1,0 +1,4 @@
+logging:
+  level: "DEBUG"
+database:
+  dsn: "sqlite+aiosqlite:///./icp_records.db"
