@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.11.3"
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'win32'",
@@ -587,18 +587,6 @@ wheels = [
 ]
 
 [[package]]
-name = "gunicorn"
-version = "23.0.0"
-source = { registry = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple/" }
-dependencies = [
-    { name = "packaging" },
-]
-sdist = { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/34/72/9614c465dc206155d93eff0ca20d42e1e35afc533971379482de953521a4/gunicorn-23.0.0.tar.gz", hash = "sha256:f014447a0101dc57e294f6c18ca6b40227a4c90e9bdb586042628030cba004ec", size = 375031, upload-time = "2024-08-10T20:25:27.378Z" }
-wheels = [
-    { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/cb/7d/6dac2a6e1eba33ee43f318edbed4ff29151a49b5d37f080aad1e6469bca4/gunicorn-23.0.0-py3-none-any.whl", hash = "sha256:ec400d38950de4dfd418cff8328b2c8faed0edb0d517d3394e457c317908ca4d", size = 85029, upload-time = "2024-08-10T20:25:24.996Z" },
-]
-
-[[package]]
 name = "h11"
 version = "0.14.0"
 source = { registry = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple/" }
@@ -691,7 +679,6 @@ dependencies = [
     { name = "aiosqlite" },
     { name = "ddddocr" },
     { name = "fastapi", extra = ["standard"] },
-    { name = "gunicorn" },
     { name = "httpx" },
     { name = "imagehash" },
     { name = "numpy" },
@@ -703,7 +690,6 @@ dependencies = [
     { name = "python-json-logger" },
     { name = "sqlalchemy", extra = ["asyncio"] },
     { name = "sqlmodel" },
-    { name = "uvicorn" },
     { name = "verboselogs" },
 ]
 
@@ -727,7 +713,6 @@ requires-dist = [
     { name = "aiosqlite", specifier = ">=0.21.0" },
     { name = "ddddocr", specifier = ">=1.5.6" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115.12" },
-    { name = "gunicorn", specifier = ">=23.0.0" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "imagehash", specifier = ">=4.3.2" },
     { name = "numpy", specifier = ">=2.2.4" },
@@ -739,7 +724,6 @@ requires-dist = [
     { name = "python-json-logger", specifier = ">=4.0.0" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.44" },
     { name = "sqlmodel", specifier = ">=0.0.27" },
-    { name = "uvicorn", specifier = ">=0.34.2" },
     { name = "verboselogs", specifier = ">=1.7" },
 ]
 
